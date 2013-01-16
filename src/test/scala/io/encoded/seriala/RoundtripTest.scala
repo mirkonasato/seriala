@@ -10,20 +10,46 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.junit.JUnitRunner
+import io.encoded.seriala.Seriala._
 
-case class Person(name: String, age: Int, children: List[Person])
+case class CaseClass(s: String, i: Int)
 
 @RunWith(classOf[JUnitRunner])
 class RoundtripTest extends FunSuite with ShouldMatchers {
 
-  test("to JSON and back") {
-    val joe = Person("Joe", 107, List(Person("Sue", 78, Nil), Person("Jack", 81, Nil)))
-    
-    val json = Seriala.toJson(joe)
-    println(json)
+  test("Boolean") {
+    toJson(true) should equal("true")
+    fromJson[Boolean]("true") should equal(true)
+  }
 
-    val joe2 = Seriala.fromJson[Person](json)
-    joe2 should equal(joe)
+  test("Int") {
+    toJson(7) should equal("7")
+    fromJson[Int]("7") should equal(7)
+  }
+
+  test("Double") {
+    toJson(7.0) should equal("7.0")
+    fromJson[Double]("7.0") should equal(7.0)
+  }
+
+  test("List[Int]") {
+    toJson(List(1, 2, 3)) should equal("[1,2,3]")
+    fromJson[List[Int]]("[1,2,3]") should equal(List(1, 2, 3))
+  }
+
+  test("Char") {
+    toJson('A') should equal("\"A\"")
+    fromJson[Char]("\"A\"") should equal('A')
+  }
+
+  test("CaseClass") {
+    val x1 = CaseClass("ABC", 123)
+    
+    val json = toJson(x1)
+    json should equal("""{"s":"ABC","i":123}""")
+
+    val x2 = fromJson[CaseClass](json)
+    x2 should equal(x1)
   }
 
 }
