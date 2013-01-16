@@ -10,8 +10,6 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.junit.JUnitRunner
-import java.io.ByteArrayOutputStream
-import java.io.ByteArrayInputStream
 
 case class Person(name: String, age: Int, children: List[Person])
 
@@ -20,18 +18,11 @@ class RoundtripTest extends FunSuite with ShouldMatchers {
 
   test("to JSON and back") {
     val joe = Person("Joe", 107, List(Person("Sue", 78, Nil), Person("Jack", 81, Nil)))
-    val out = new ByteArrayOutputStream
-    val writer = Seriala.newJsonWriter(out)
-    writer.write(joe)
-    writer.close()
     
-    val json = out.toString("UTF-8")
+    val json = Seriala.toJson(joe)
     println(json)
 
-    val reader = Seriala.newJsonReader(new ByteArrayInputStream(json.getBytes("UTF-8")))
-    val joe2 = reader.read[Person]()
-    reader.close()
-    
+    val joe2 = Seriala.fromJson[Person](json)
     joe2 should equal(joe)
   }
 
