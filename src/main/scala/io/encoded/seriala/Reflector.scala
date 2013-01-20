@@ -15,9 +15,12 @@ protected trait Reflector {
     case t: TypeRefApi => t.args
   }
 
-  protected def constructorArguments(tpe: Type) =
-    tpe.member(nme.CONSTRUCTOR).asMethod.paramss.head map {
+  protected def constructorArguments(tpe: Type) = {
+    val ctor = tpe.member(nme.CONSTRUCTOR)
+    if (ctor == NoSymbol) throw new IllegalArgumentException("unsupported type with no constructor: "+ tpe)
+    ctor.asMethod.paramss.head map {
       p => (p.name.decoded, p.typeSignature)
     }
+  }
 
 }
