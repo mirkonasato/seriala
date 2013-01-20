@@ -37,6 +37,11 @@ class RoundtripTest extends FunSuite with ShouldMatchers {
     fromJson[List[Int]]("[1,2,3]") should equal(List(1, 2, 3))
   }
 
+  test("Map[String,Int]") {
+    toJson(Map("a" -> 1, "b" -> 2, "c" -> 3)) should equal("{\"a\":1,\"b\":2,\"c\":3}")
+    fromJson[Map[String, Int]]("{\"a\":1,\"b\":2,\"c\":3}") should equal(Map("a" -> 1, "b" -> 2, "c" -> 3))
+  }
+
   test("Char") {
     toJson('A') should equal("\"A\"")
     fromJson[Char]("\"A\"") should equal('A')

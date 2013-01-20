@@ -29,16 +29,25 @@ class JacksonSerialWriter(generator: JsonGenerator) extends SerialWriter with Re
       case x: Double => generator.writeNumber(x)
       case x: Char => generator.writeString(x.toString)
       case x: String => generator.writeString(x)
-      case x: Seq[_] => writeSeq(x, typeArguments(tpe).head)
+      case x: Map[String, _] => writeMap(x, typeArguments(tpe))
+      case x: Seq[Any] => writeSeq(x, typeArguments(tpe).head)
       case _ => writeObject(any, tpe)
     }
   }
 
-  private def writeSeq[T](xs: Seq[T], itemType: Type) {
+  private def writeSeq(xs: Seq[Any], itemType: Type) {
     generator.writeStartArray()
-    for (x <- xs)
-      writeAny(x, itemType)
+    for (x <- xs) writeAny(x, itemType)
     generator.writeEndArray()
+  }
+
+  private def writeMap(xs: Map[String, Any], typeArgs: List[Type]) {
+    generator.writeStartObject()
+    for ((name, value) <- xs) {
+      generator.writeFieldName(name)
+      writeAny(value, typeArgs(1))
+    }
+    generator.writeEndObject()
   }
 
   private def writeObject(x: Any, tpe: Type) {

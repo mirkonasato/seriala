@@ -16,8 +16,9 @@ class JacksonSerialReader(parser: JsonParser) extends SerialReader with Reflecto
 
   import definitions._
   
-  val StringType = typeOf[String]
   val ListType = typeOf[List[Any]]
+  val MapType = typeOf[Map[String, Any]]
+  val StringType = typeOf[String]
 
   def read[T]()(implicit ttag: TypeTag[T]): T = {
     parser.nextToken()
@@ -36,10 +37,8 @@ class JacksonSerialReader(parser: JsonParser) extends SerialReader with Reflecto
     case x if x <:< DoubleTpe => parser.getDoubleValue()
     case x if x <:< CharTpe => parser.getText().head
     case x if x <:< StringType => parser.getText()
-    case x if x <:< ListType => {
-      val itemType = typeArguments(tpe).head
-      readArray(typeArguments(tpe).head)
-    }
+    case x if x <:< ListType => readArray(typeArguments(tpe).head)
+    case x if x <:< MapType => readMap(typeArguments(tpe)(1))
     case _ => readObject(tpe)
   }
 
@@ -49,6 +48,21 @@ class JacksonSerialReader(parser: JsonParser) extends SerialReader with Reflecto
     val builder = List.newBuilder[Any]
     while (parser.nextToken() != JsonToken.END_ARRAY) {
       builder += readAny(itemType)
+    }
+    builder.result
+  }
+
+  private def readMap(itemType: Type): Map[String, Any] = {
+    val builder = Map.newBuilder[String, Any]
+    if (parser.getCurrentToken() != JsonToken.START_OBJECT)
+      throw new JsonParseException("not START_OBJECT but "+ parser.getCurrentToken(), parser.getCurrentLocation())
+    while (parser.nextToken() != JsonToken.END_OBJECT) {
+      if (parser.getCurrentToken() != JsonToken.FIELD_NAME)
+        throw new JsonParseException("not FIELD_NAME", parser.getCurrentLocation())
+      val name = parser.getText()
+      parser.nextToken()
+      val value = readAny(itemType)
+      builder += name -> value
     }
     builder.result
   }
