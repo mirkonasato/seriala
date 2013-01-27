@@ -35,7 +35,7 @@ Avro Example
 DatumWriter and DatumReader implementations are provided for dealing with
 [Avro files](http://avro.apache.org/docs/1.7.3/gettingstartedjava.html#Serializing):
 
-    val avroSchema = SchemaConversions.toAvroSchema(Schema.schemaOf[Record])
+    val avroSchema = SchemaConversions.toAvroSchema(Schema.schemaOf[User])
 
     val datumWriter = new ScalaDatumWriter[User]
     val fileWriter = new DataFileWriter(datumWriter)
