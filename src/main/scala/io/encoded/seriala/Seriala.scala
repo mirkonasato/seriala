@@ -17,11 +17,19 @@ object Seriala {
 
   val Jackson = new JsonFactory()
 
-  def newJsonWriter(out: OutputStream): SerialWriter =
-    new JacksonSerialWriter(Jackson.createGenerator(out)) 
+  def newJsonWriter(out: OutputStream): SerialWriter = {
+    val generator = Jackson.createGenerator(out)
+    new JacksonSerialWriter(generator)
+  } 
 
   def newJsonReader(in: InputStream): SerialReader =
     new JacksonSerialReader(Jackson.createParser(in))
+
+  def newAvroWriter(out: OutputStream): SerialWriter =
+    new AvroSerialWriter(out)
+
+  def newAvroReader(in: InputStream): SerialReader =
+    new AvroSerialReader(in)
 
   def fromJson[T](json: String)(implicit ttag: TypeTag[T]): T = {
     val reader = newJsonReader(new ByteArrayInputStream(json.getBytes("UTF-8")))
