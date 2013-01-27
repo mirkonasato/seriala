@@ -4,17 +4,18 @@
 // Licensed under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 //
-package io.encoded.seriala
+package io.encoded.seriala.jackson
 
-import com.fasterxml.jackson.core.JsonParser
-import scala.reflect.runtime.universe._
+import io.encoded.seriala._
 import scala.reflect.runtime.currentMirror
+import scala.reflect.runtime.universe._
+import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonToken
 
-class JacksonSerialReader(parser: JsonParser) extends SerialReader {
+class JacksonSerialReader[T](parser: JsonParser)(implicit typeTag: TypeTag[T]) extends SerialReader[T] {
 
-  def read[T]()(implicit ttag: TypeTag[T]): T = {
+  def read(): T = {
     parser.nextToken()
     readAny(Schema.schemaOf[T]).asInstanceOf[T]
   }

@@ -4,13 +4,14 @@
 // Licensed under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 //
-package io.encoded.seriala
+package io.encoded.seriala.jackson
 
+import io.encoded.seriala.Seriala._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers
+import scala.reflect.runtime.universe._
 import org.scalatest.junit.JUnitRunner
-import io.encoded.seriala.Seriala._
 
 case class CaseClass(s: String, i: Int)
 
@@ -33,8 +34,8 @@ class JsonRoundtripTest extends FunSuite with ShouldMatchers {
   }
 
   test("Option[Int]") {
-    toJson(Some(3)) should equal("7")
-    fromJson[Option[Int]]("7") should equal(Some(3))
+    toJson(Some(7)) should equal("7")
+    fromJson[Option[Int]]("7") should equal(Some(7))
     
     toJson[Option[Int]](None) should equal("null")
     fromJson[Option[Int]]("null") should equal(None)

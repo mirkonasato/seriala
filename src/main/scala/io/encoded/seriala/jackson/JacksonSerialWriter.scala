@@ -4,16 +4,16 @@
 // Licensed under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 //
-package io.encoded.seriala
+package io.encoded.seriala.jackson
 
-import com.fasterxml.jackson.core.JsonGenerator
-import scala.reflect.runtime.universe._
+import io.encoded.seriala._
 import scala.reflect.runtime.currentMirror
-import org.apache.avro.io.EncoderFactory
+import scala.reflect.runtime.universe._
+import com.fasterxml.jackson.core.JsonGenerator
 
-class JacksonSerialWriter(generator: JsonGenerator) extends SerialWriter {
+class JacksonSerialWriter[T](generator: JsonGenerator)(implicit typeTag: TypeTag[T]) extends SerialWriter[T] {
 
-  def write[T](x: T)(implicit ttag: TypeTag[T]) {
+  def write(x: T) {
     writeAny(x, Schema.schemaOf[T])
   }
 

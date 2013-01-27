@@ -12,36 +12,40 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import com.fasterxml.jackson.core.JsonFactory
 import scala.reflect.runtime.universe.TypeTag
+import io.encoded.seriala.avro.AvroSerialWriter
+import io.encoded.seriala.avro.AvroSerialReader
+import io.encoded.seriala.jackson.JacksonSerialReader
+import io.encoded.seriala.jackson.JacksonSerialWriter
 
 object Seriala {
 
   val Jackson = new JsonFactory()
 
-  def newJsonWriter(out: OutputStream): SerialWriter = {
+  def newJsonWriter[T](out: OutputStream)(implicit typeTag: TypeTag[T]): SerialWriter[T] = {
     val generator = Jackson.createGenerator(out)
-    new JacksonSerialWriter(generator)
+    new JacksonSerialWriter[T](generator)
   } 
 
-  def newJsonReader(in: InputStream): SerialReader =
-    new JacksonSerialReader(Jackson.createParser(in))
+  def newJsonReader[T](in: InputStream)(implicit typeTag: TypeTag[T]): SerialReader[T] =
+    new JacksonSerialReader[T](Jackson.createParser(in))
 
-  def newAvroWriter(out: OutputStream): SerialWriter =
-    new AvroSerialWriter(out)
+  def newAvroWriter[T](out: OutputStream)(implicit typeTag: TypeTag[T]): SerialWriter[T] =
+    new AvroSerialWriter[T](out)
 
-  def newAvroReader(in: InputStream): SerialReader =
-    new AvroSerialReader(in)
+  def newAvroReader[T](in: InputStream)(implicit typeTag: TypeTag[T]): SerialReader[T] =
+    new AvroSerialReader[T](in)
 
   def fromJson[T](json: String)(implicit ttag: TypeTag[T]): T = {
-    val reader = newJsonReader(new ByteArrayInputStream(json.getBytes("UTF-8")))
+    val reader = newJsonReader[T](new ByteArrayInputStream(json.getBytes("UTF-8")))
     try
-      reader.read[T]
+      reader.read
     finally
       reader.close()
   }
 
   def toJson[T](x: T)(implicit ttag: TypeTag[T]): String = {
     val out = new ByteArrayOutputStream
-    val writer = Seriala.newJsonWriter(out)
+    val writer = Seriala.newJsonWriter[T](out)
     try
       writer.write(x)
     finally

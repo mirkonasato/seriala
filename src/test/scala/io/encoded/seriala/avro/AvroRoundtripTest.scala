@@ -4,15 +4,20 @@
 // Licensed under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 //
-package io.encoded.seriala
+package io.encoded.seriala.avro
 
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.junit.JUnitRunner
 import scala.reflect.runtime.universe._
 import java.io.ByteArrayOutputStream
 import java.io.ByteArrayInputStream
+import io.encoded.seriala.jackson.CaseClass
+import io.encoded.seriala.Seriala
+import scala.reflect.runtime.universe.TypeTag.Boolean
+import scala.reflect.runtime.universe.TypeTag.Double
+import scala.reflect.runtime.universe.TypeTag.Int
+import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class AvroRoundtripTest extends FunSuite with ShouldMatchers {
@@ -51,7 +56,7 @@ class AvroRoundtripTest extends FunSuite with ShouldMatchers {
 
   private def toAvro[T](value: T)(implicit ttag: TypeTag[T]) = {
     val bytes = new ByteArrayOutputStream()
-    val writer = Seriala.newAvroWriter(bytes)
+    val writer = Seriala.newAvroWriter[T](bytes)
     writer.write(value)
     writer.close()
     bytes.toByteArray()
@@ -59,7 +64,7 @@ class AvroRoundtripTest extends FunSuite with ShouldMatchers {
 
   private def fromAvro[T](bytes: Array[Byte])(implicit ttag: TypeTag[T]) = {
     val in = new ByteArrayInputStream(bytes)
-    Seriala.newAvroReader(in).read[T]
+    Seriala.newAvroReader[T](in).read()
   }
 
 }

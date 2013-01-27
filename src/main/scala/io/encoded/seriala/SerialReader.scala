@@ -8,9 +8,9 @@ package io.encoded.seriala
 
 import scala.reflect.runtime.universe._
 
-trait SerialReader {
+trait SerialReader[T] {
 
-  def read[T]()(implicit ttag: TypeTag[T]): T
+  def read(): T
 
   def close()
 

@@ -8,9 +8,9 @@ package io.encoded.seriala
 
 import scala.reflect.runtime.universe._
 
-trait SerialWriter {
+trait SerialWriter[T] {
 
-  def write[T](x: T)(implicit ttag: TypeTag[T])
+  def write(x: T)
 
   def close()
 
