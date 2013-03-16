@@ -6,7 +6,7 @@
 //
 package io.encoded.seriala.jackson
 
-import io.encoded.seriala.Seriala._
+import io.encoded.seriala.jackson.JacksonSeriala._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers

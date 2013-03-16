@@ -12,12 +12,12 @@ import org.scalatest.matchers.ShouldMatchers
 import scala.reflect.runtime.universe._
 import java.io.ByteArrayOutputStream
 import java.io.ByteArrayInputStream
-import io.encoded.seriala.jackson.CaseClass
-import io.encoded.seriala.Seriala
 import scala.reflect.runtime.universe.TypeTag.Boolean
 import scala.reflect.runtime.universe.TypeTag.Double
 import scala.reflect.runtime.universe.TypeTag.Int
 import org.scalatest.junit.JUnitRunner
+
+case class CaseClass(s: String, i: Int)
 
 @RunWith(classOf[JUnitRunner])
 class AvroRoundtripTest extends FunSuite with ShouldMatchers {
@@ -56,7 +56,7 @@ class AvroRoundtripTest extends FunSuite with ShouldMatchers {
 
   private def toAvro[T](value: T)(implicit ttag: TypeTag[T]) = {
     val bytes = new ByteArrayOutputStream()
-    val writer = Seriala.newAvroWriter[T](bytes)
+    val writer = AvroSeriala.newAvroWriter[T](bytes)
     writer.write(value)
     writer.close()
     bytes.toByteArray()
@@ -64,7 +64,7 @@ class AvroRoundtripTest extends FunSuite with ShouldMatchers {
 
   private def fromAvro[T](bytes: Array[Byte])(implicit ttag: TypeTag[T]) = {
     val in = new ByteArrayInputStream(bytes)
-    Seriala.newAvroReader[T](in).read()
+    AvroSeriala.newAvroReader[T](in).read()
   }
 
 }
