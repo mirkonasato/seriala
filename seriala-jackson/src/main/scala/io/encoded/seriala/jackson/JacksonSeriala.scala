@@ -27,23 +27,29 @@ object JacksonSeriala {
   def newJsonReader[T](in: InputStream)(implicit typeTag: TypeTag[T]): SerialReader[T] =
     new JacksonSerialReader[T](Jackson.createParser(in))
 
-      def fromJson[T](json: String)(implicit ttag: TypeTag[T]): T = {
-    val reader = newJsonReader[T](new ByteArrayInputStream(json.getBytes("UTF-8")))
+  def fromJson[T](in: InputStream)(implicit typeTag: TypeTag[T]): T = {
+    val reader = newJsonReader[T](in)
     try
       reader.read
     finally
       reader.close()
   }
 
-  def toJson[T](x: T)(implicit ttag: TypeTag[T]): String = {
-    val out = new ByteArrayOutputStream
+  def fromJson[T](json: String)(implicit ttag: TypeTag[T]): T =
+    fromJson[T](new ByteArrayInputStream(json.getBytes("UTF-8")))
+
+  def toJson[T](out: OutputStream, x: T)(implicit ttag: TypeTag[T]) {
     val writer = JacksonSeriala.newJsonWriter[T](out)
     try
       writer.write(x)
     finally
       writer.close()
+  }
+
+  def toJson[T](x: T)(implicit ttag: TypeTag[T]): String = {
+    val out = new ByteArrayOutputStream
+    toJson(out, x)
     out.toString("UTF-8")
   }
 
 }
-
