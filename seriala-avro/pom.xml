@@ -7,9 +7,9 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>seriala-core</artifactId>
+  <artifactId>seriala-avro</artifactId>
   <packaging>jar</packaging>
-  <name>Seriala Core</name>
+  <name>Seriala Avro</name>
 
   <dependencies>
     <dependency>
@@ -22,8 +22,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>seriala-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.avro</groupId>
