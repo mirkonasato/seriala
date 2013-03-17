@@ -23,10 +23,10 @@ JSON Example
     scala> val joe = User(1000, "joe", List("admin", "staff"))
     joe: User = User(1000,joe,List(admin, staff))
     
-    scala> val json = JacksonSeriala.toJson(joe)
+    scala> val json = JsonFactory.toJson(joe)
     json: String = {"id":1000,"name":"joe","groups":["admin","staff"]}
     
-    scala> val joe2 = JacksonSeriala.fromJson[User](json)
+    scala> val joe2 = JsonFactory.fromJson[User](json)
     joe2: User = User(1000,joe,List(admin, staff))
 
 Avro Example

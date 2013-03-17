@@ -13,13 +13,14 @@ import java.io.ByteArrayOutputStream
 import scala.reflect.runtime.universe.TypeTag
 import io.encoded.seriala.SerialReader
 import io.encoded.seriala.SerialWriter
+import io.encoded.seriala.SerialFactory
 
-object AvroSeriala {
+object AvroFactory extends SerialFactory {
 
-  def newAvroWriter[T](out: OutputStream)(implicit typeTag: TypeTag[T]): SerialWriter[T] =
+  def newSerialWriter[T](out: OutputStream)(implicit typeTag: TypeTag[T]): SerialWriter[T] =
     new AvroSerialWriter[T](out)
 
-  def newAvroReader[T](in: InputStream)(implicit typeTag: TypeTag[T]): SerialReader[T] =
+  def newSerialReader[T](in: InputStream)(implicit typeTag: TypeTag[T]): SerialReader[T] =
     new AvroSerialReader[T](in)
 
 }
