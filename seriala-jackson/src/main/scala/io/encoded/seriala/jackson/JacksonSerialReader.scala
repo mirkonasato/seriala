@@ -68,27 +68,34 @@ class JacksonSerialReader[T](parser: JsonParser)(implicit typeTag: TypeTag[T]) e
   private def readObject(objectSchema: ObjectSchema) = {
     val fieldMap = objectSchema.fields.toMap
     val valueBuilder = Map.newBuilder[String,Any]
-    
+
     if (parser.getCurrentToken() != JsonToken.START_OBJECT)
       throw new JsonParseException("not START_OBJECT but "+ parser.getCurrentToken(), parser.getCurrentLocation())
-    
+
     while (parser.nextToken() != JsonToken.END_OBJECT) {
       if (parser.getCurrentToken() != JsonToken.FIELD_NAME)
         throw new JsonParseException("not FIELD_NAME", parser.getCurrentLocation())
       val name = parser.getText()
       if (!fieldMap.contains(name))
-        throw new JsonParseException("unknown field: "+ name, parser.getCurrentLocation())
-      
+        throw new JsonParseException("unknown field: "+ name +" for object "+ objectSchema, parser.getCurrentLocation())
+
       parser.nextToken()
       val fieldSchema = fieldMap(name)
       val value = readAny(fieldSchema)
       valueBuilder += name -> value
     }
     val valueMap = valueBuilder.result
-    
+
     val ctor = objectSchema.scalaType.declaration(nme.CONSTRUCTOR).asMethod
-    val values = ctor.paramss.head map { sym => valueMap(sym.name.decoded) }
-    
+    val values = ctor.paramss.head map { sym =>
+      val fieldName = sym.name.decoded
+      if (valueMap.contains(fieldName)) valueMap(sym.name.decoded)
+      else fieldMap(fieldName) match {
+        case s: OptionSchema => None
+        case _ => throw new JsonParseException("missing required field "+ fieldName +" for object "+ objectSchema, parser.getCurrentLocation())
+      }
+    }
+
     val classMirror = currentMirror.reflectClass(objectSchema.scalaType.typeSymbol.asClass)
     classMirror.reflectConstructor(ctor).apply(values: _*)
   }
