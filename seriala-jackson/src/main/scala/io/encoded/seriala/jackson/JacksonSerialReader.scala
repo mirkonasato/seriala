@@ -13,7 +13,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonToken
 
-class JacksonSerialReader[T](parser: JsonParser)(implicit typeTag: TypeTag[T]) extends SerialReader[T] {
+class JacksonSerialReader[T](parser: JsonParser, ignoreUnkwnown: Boolean = false)(implicit typeTag: TypeTag[T]) extends SerialReader[T] {
 
   def read(): T = {
     parser.nextToken()
@@ -76,13 +76,17 @@ class JacksonSerialReader[T](parser: JsonParser)(implicit typeTag: TypeTag[T]) e
       if (parser.getCurrentToken() != JsonToken.FIELD_NAME)
         throw new JsonParseException("not FIELD_NAME", parser.getCurrentLocation())
       val name = parser.getText()
-      if (!fieldMap.contains(name))
-        throw new JsonParseException("unknown field: "+ name +" for object "+ objectSchema, parser.getCurrentLocation())
-
       parser.nextToken()
-      val fieldSchema = fieldMap(name)
-      val value = readAny(fieldSchema)
-      valueBuilder += name -> value
+      if (fieldMap.contains(name)) {
+        val fieldSchema = fieldMap(name)
+        val value = readAny(fieldSchema)
+        valueBuilder += name -> value        
+      } else {
+        if (ignoreUnkwnown)
+          parser.skipChildren()
+        else
+          throw new JsonParseException("unknown field: "+ name +" for object "+ objectSchema, parser.getCurrentLocation())        
+      }
     }
     val valueMap = valueBuilder.result
 

@@ -15,7 +15,7 @@ import io.encoded.seriala.SerialReader
 import io.encoded.seriala.SerialWriter
 import io.encoded.seriala.SerialFactory
 
-object JsonFactory extends SerialFactory {
+class JsonFactory(ignoreUnknown: Boolean = false) extends SerialFactory {
 
   val Jackson = new com.fasterxml.jackson.core.JsonFactory()
 
@@ -23,6 +23,8 @@ object JsonFactory extends SerialFactory {
     new JacksonSerialWriter[T](Jackson.createGenerator(out))
 
   def newSerialReader[T](in: InputStream)(implicit typeTag: TypeTag[T]): SerialReader[T] =
-    new JacksonSerialReader[T](Jackson.createParser(in))
+    new JacksonSerialReader[T](Jackson.createParser(in), ignoreUnknown)
 
 }
+
+object JsonFactory extends JsonFactory(false)

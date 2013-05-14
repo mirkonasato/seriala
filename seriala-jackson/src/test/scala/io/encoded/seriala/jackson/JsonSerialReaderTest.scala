@@ -29,4 +29,15 @@ class JsonSerialReaderTest extends FunSuite with ShouldMatchers {
     }
   }
 
+  test("unknown fields are not accepted by default") {
+    intercept[JsonParseException] {
+      fromJson[ClassWithOptionalField]("""{"id":"test-id","otherProperty":"other value"}""")
+    }
+  }
+
+  test("unknown fields can optionally be ignored") {
+    val jsonFactory = new JsonFactory(ignoreUnknown = true)
+    jsonFactory.fromString[ClassWithOptionalField]("""{"id":"test-id","otherProperty":[1,2,3]}""")
+  }
+
 }
