@@ -4,7 +4,7 @@ Seriala
 A serialization library for Scala.
 
 This is in experimental stage, started as a way to try out the then new Scala 2.10
-[http://docs.scala-lang.org/overviews/reflection/overview.html](reflection API), and now updated for Scala 2.11.
+[reflection API](http://docs.scala-lang.org/overviews/reflection/overview.html), and now updated for Scala 2.11.
 
 Design Goals
 ------------
