@@ -88,7 +88,7 @@ class ScalaDatumWriter[T](implicit ttag: TypeTag[T]) extends DatumWriter[T] {
   private def writeObject(encoder: Encoder, obj: Any, objectSchema: ObjectSchema) {
     val instance = currentMirror.reflect(obj)
     for ((fieldName, fieldSchema) <- objectSchema.fields) {
-      val accessor = objectSchema.scalaType.member(stringToTermName(fieldName)).asMethod
+      val accessor = objectSchema.scalaType.member(TermName(fieldName)).asMethod
       val fieldValue = instance.reflectMethod(accessor).apply()
       writeAny(encoder, fieldValue, fieldSchema)
     }

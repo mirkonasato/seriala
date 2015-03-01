@@ -8,15 +8,13 @@ package io.encoded.seriala.jackson
 
 import io.encoded.seriala.jackson.JsonFactory.{fromString => fromJson, toString => toJson}
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
-import scala.reflect.runtime.universe._
+import org.scalatest.{Matchers, FunSuite}
 import org.scalatest.junit.JUnitRunner
 
 case class CaseClass(s: String, i: Int)
 
 @RunWith(classOf[JUnitRunner])
-class JsonRoundtripTest extends FunSuite with ShouldMatchers {
+class JsonRoundtripTest extends FunSuite with Matchers {
 
   test("Boolean") {
     toJson(true) should equal("true")

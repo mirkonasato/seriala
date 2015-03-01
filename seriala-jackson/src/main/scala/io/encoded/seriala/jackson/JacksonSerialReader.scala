@@ -90,10 +90,10 @@ class JacksonSerialReader[T](parser: JsonParser, ignoreUnkwnown: Boolean = false
     }
     val valueMap = valueBuilder.result
 
-    val ctor = objectSchema.scalaType.declaration(nme.CONSTRUCTOR).asMethod
-    val values = ctor.paramss.head map { sym =>
-      val fieldName = sym.name.decoded
-      if (valueMap.contains(fieldName)) valueMap(sym.name.decoded)
+    val ctor = objectSchema.scalaType.decl(termNames.CONSTRUCTOR).asMethod
+    val values = ctor.paramLists.head map { sym =>
+      val fieldName = sym.name.decodedName.toString
+      if (valueMap.contains(fieldName)) valueMap(fieldName)
       else fieldMap(fieldName) match {
         case s: OptionSchema => None
         case _ => throw new JsonParseException("missing required field "+ fieldName +" for object "+ objectSchema, parser.getCurrentLocation())

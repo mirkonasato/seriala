@@ -1,5 +1,7 @@
 .cache
 .classpath
+.idea
 .project
 .settings
 target
+*.iml

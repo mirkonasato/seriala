@@ -6,18 +6,16 @@
 //
 package io.encoded.seriala.jackson
 
-import io.encoded.seriala.jackson.JsonFactory.{fromString => fromJson, toString => toJson}
+import io.encoded.seriala.jackson.JsonFactory.{fromString => fromJson}
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
-import scala.reflect.runtime.universe._
+import org.scalatest.{Matchers, FunSuite}
 import org.scalatest.junit.JUnitRunner
 import com.fasterxml.jackson.core.JsonParseException
 
 case class ClassWithOptionalField(id: String, foreignId: Option[String] = None)
 
 @RunWith(classOf[JUnitRunner])
-class JsonSerialReaderTest extends FunSuite with ShouldMatchers {
+class JsonSerialReaderTest extends FunSuite with Matchers {
 
   test("missing optional field") {
     fromJson[ClassWithOptionalField]("""{"id":"test-id"}""") should equal(ClassWithOptionalField("test-id"))

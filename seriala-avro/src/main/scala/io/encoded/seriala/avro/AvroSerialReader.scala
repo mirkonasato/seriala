@@ -24,7 +24,7 @@ import io.encoded.seriala.StringSchema
 
 class AvroSerialReader[T](in: InputStream)(implicit typeTag: TypeTag[T]) extends SerialReader[T] {
 
-  val decoder = DecoderFactory.get().binaryDecoder(in, null);
+  val decoder = DecoderFactory.get().binaryDecoder(in, null)
   val datumReader = new ScalaDatumReader[T]
 
   def read(): T = datumReader.read(null.asInstanceOf[T], decoder)

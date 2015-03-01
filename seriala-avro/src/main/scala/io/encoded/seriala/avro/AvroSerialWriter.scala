@@ -13,7 +13,7 @@ import io.encoded.seriala.SerialWriter
 
 class AvroSerialWriter[T](out: OutputStream)(implicit typeTag: TypeTag[T]) extends SerialWriter[T] {
 
-  val encoder = EncoderFactory.get().binaryEncoder(out, null);
+  val encoder = EncoderFactory.get().binaryEncoder(out, null)
   val datumWriter = new ScalaDatumWriter[T]
 
   def write(x: T) { datumWriter.write(x, encoder) }

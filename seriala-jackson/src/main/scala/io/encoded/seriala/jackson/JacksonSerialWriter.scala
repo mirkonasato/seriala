@@ -60,7 +60,7 @@ class JacksonSerialWriter[T](generator: JsonGenerator)(implicit typeTag: TypeTag
     val instance = currentMirror.reflect(obj)
     generator.writeStartObject()
     for ((fieldName, fieldSchema) <- objectSchema.fields) {
-      val accessor = objectSchema.scalaType.member(stringToTermName(fieldName)).asMethod
+      val accessor = objectSchema.scalaType.member(TermName(fieldName)).asMethod
       val fieldValue = instance.reflectMethod(accessor).apply()
       generator.writeFieldName(fieldName)
       writeAny(fieldValue, fieldSchema)

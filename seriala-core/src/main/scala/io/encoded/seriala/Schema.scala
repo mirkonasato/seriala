@@ -28,10 +28,10 @@ class ObjectSchema(name: String, val scalaType: Type) extends Schema(name) {
 
   def fields: List[(String, Schema)] = _fields
 
-  override def toString = name + "(" + (fields.foldLeft("") { (s, f) => s + ", " + f._1 + ": " + repr(f._2) }) + ")"
+  override def toString = name + "(" + fields.foldLeft("") { (s, f) => s + ", " + f._1 + ": " + repr(f._2) } + ")"
 
   private def repr(schema: Schema) = schema match {
-    case x: ObjectSchema => x.name + "(" + (x.fields.foldLeft("") { (s, f) => s + ", " + f._1 + ": " + f._2.name }) + ")"
+    case x: ObjectSchema => x.name + "(" + x.fields.foldLeft("") { (s, f) => s + ", " + f._1 + ": " + f._2.name } + ")"
     case x => x.toString
   }
 }
@@ -57,29 +57,23 @@ object Schema {
     case t if t <:< FloatType => FloatSchema
     case t if t <:< DoubleType => DoubleSchema
     case t if t <:< StringType => StringSchema
-    case t if t <:< OptionType => new OptionSchema(buildSchema(typeArgs(t)(0), knownObjects))
-    case t if t <:< ListType => new ListSchema(buildSchema(typeArgs(t)(0), knownObjects))
-    case t if t <:< MapType => new MapSchema(buildSchema(typeArgs(t)(1), knownObjects))
+    case t if t <:< OptionType => new OptionSchema(buildSchema(t.typeArgs(0), knownObjects))
+    case t if t <:< ListType => new ListSchema(buildSchema(t.typeArgs(0), knownObjects))
+    case t if t <:< MapType => new MapSchema(buildSchema(t.typeArgs(1), knownObjects))
     case t if knownObjects.contains(t) => knownObjects(t)
-    case t => {
+    case t =>
       // initialize fields later to handle circular dependencies
-      val objectSchema = new ObjectSchema(t.typeSymbol.name.decoded, scalaType)
+      val objectSchema = new ObjectSchema(t.typeSymbol.name.decodedName.toString, scalaType)
       objectSchema._fields = fieldsOf(t, knownObjects + (t -> objectSchema))
       objectSchema
-    }
-  }
-
-  private def typeArgs(scalaType: Type): List[Type] = scalaType match {
-    // see http://stackoverflow.com/questions/12842729/finding-type-parameters-via-reflection-in-scala-2-10
-    case t: TypeRefApi => t.args
   }
 
   private def fieldsOf(scalaType: Type, knownObjects: Map[Type, Schema]) = {
-    val ctor = scalaType.member(nme.CONSTRUCTOR)
+    val ctor = scalaType.member(termNames.CONSTRUCTOR)
     if (ctor == NoSymbol)
       throw new IllegalArgumentException("unsupported type with no constructor: "+ scalaType)
-    ctor.asMethod.paramss.head map {
-      p => (p.name.decoded, buildSchema(p.typeSignature, knownObjects))
+    ctor.asMethod.paramLists.head map {
+      p => (p.name.decodedName.toString, buildSchema(p.typeSignature, knownObjects))
     }
   }
 

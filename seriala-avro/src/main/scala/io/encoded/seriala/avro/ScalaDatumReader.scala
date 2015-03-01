@@ -85,7 +85,7 @@ class ScalaDatumReader[T](implicit ttag: TypeTag[T]) extends DatumReader[T] {
     val values = List.newBuilder[Any]
     for ((_, fieldSchema) <- objectSchema.fields)
       values += readAny(decoder, fieldSchema)
-    val ctor = objectSchema.scalaType.declaration(nme.CONSTRUCTOR).asMethod
+    val ctor = objectSchema.scalaType.decl(termNames.CONSTRUCTOR).asMethod
     val classMirror = currentMirror.reflectClass(objectSchema.scalaType.typeSymbol.asClass)
     classMirror.reflectConstructor(ctor).apply(values.result: _*)
   }

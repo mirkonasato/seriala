@@ -7,18 +7,14 @@
 package io.encoded.seriala.avro
 
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
-import scala.reflect.runtime.universe._
-import java.io.ByteArrayOutputStream
-import java.io.ByteArrayInputStream
+import org.scalatest.{Matchers, FunSuite}
 import org.scalatest.junit.JUnitRunner
 import io.encoded.seriala.avro.AvroFactory.{fromByteArray => fromAvro, toByteArray => toAvro}
 
 case class CaseClass(s: String, i: Int)
 
 @RunWith(classOf[JUnitRunner])
-class AvroRoundtripTest extends FunSuite with ShouldMatchers {
+class AvroRoundtripTest extends FunSuite with Matchers {
 
   test("Boolean") {
     fromAvro[Boolean](toAvro(true)) should equal(true)

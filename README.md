@@ -3,9 +3,8 @@ Seriala
 
 A serialization library for Scala.
 
-Requires Scala 2.10 and its "experimental" reflection API - i.e. scala-reflect.jar.
-
-Warning: this is alpha quality code in early stage of development.
+This is in experimental stage, started as a way to try out the then new Scala 2.10
+[http://docs.scala-lang.org/overviews/reflection/overview.html](reflection API), and now updated for Scala 2.11.
 
 Design Goals
 ------------
@@ -23,17 +22,17 @@ JSON Example
     scala> val joe = User(1000, "joe", List("admin", "staff"))
     joe: User = User(1000,joe,List(admin, staff))
     
-    scala> val json = JsonFactory.toJson(joe)
+    scala> val json = JsonFactory.toString(joe)
     json: String = {"id":1000,"name":"joe","groups":["admin","staff"]}
     
-    scala> val joe2 = JsonFactory.fromJson[User](json)
+    scala> val joe2 = JsonFactory.fromString[User](json)
     joe2: User = User(1000,joe,List(admin, staff))
 
 Avro Example
 ------------
 
 DatumWriter and DatumReader implementations are provided for dealing with
-[Avro files](http://avro.apache.org/docs/1.7.3/gettingstartedjava.html#Serializing):
+[Avro files](http://avro.apache.org/docs/1.7.7/gettingstartedjava.html#Serializing):
 
     val avroSchema = SchemaConversions.toAvroSchema(Schema.schemaOf[User])
 
@@ -49,4 +48,3 @@ DatumWriter and DatumReader implementations are provided for dealing with
     while (fileReader.hasNext()) {
       val user = fileReader.next()
     }
-
