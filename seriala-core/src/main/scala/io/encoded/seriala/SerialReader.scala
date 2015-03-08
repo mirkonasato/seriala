@@ -6,8 +6,6 @@
 //
 package io.encoded.seriala
 
-import scala.reflect.runtime.universe._
-
 trait SerialReader[T] {
 
   def read(): T

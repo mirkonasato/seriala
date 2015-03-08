@@ -7,7 +7,7 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>seriala-core</artifactId>
+  <artifactId>seriala-core_${scala.version}</artifactId>
   <packaging>jar</packaging>
   <name>Seriala Core</name>
 

@@ -6,8 +6,6 @@
 //
 package io.encoded.seriala
 
-import scala.reflect.runtime.universe._
-
 trait SerialWriter[T] {
 
   def write(x: T)
