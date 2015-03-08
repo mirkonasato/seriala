@@ -8,8 +8,6 @@ package io.encoded.seriala.avro
 
 import java.io.InputStream
 import java.io.OutputStream
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import scala.reflect.runtime.universe.TypeTag
 import io.encoded.seriala.SerialReader
 import io.encoded.seriala.SerialWriter
@@ -17,10 +15,10 @@ import io.encoded.seriala.SerialFactory
 
 object AvroFactory extends SerialFactory {
 
-  def newSerialWriter[T](out: OutputStream)(implicit typeTag: TypeTag[T]): SerialWriter[T] =
+  def newSerialWriter[T: TypeTag](out: OutputStream): SerialWriter[T] =
     new AvroSerialWriter[T](out)
 
-  def newSerialReader[T](in: InputStream)(implicit typeTag: TypeTag[T]): SerialReader[T] =
+  def newSerialReader[T: TypeTag](in: InputStream): SerialReader[T] =
     new AvroSerialReader[T](in)
 
 }

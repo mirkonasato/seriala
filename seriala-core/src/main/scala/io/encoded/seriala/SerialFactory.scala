@@ -14,11 +14,11 @@ import scala.reflect.runtime.universe.TypeTag
 
 trait SerialFactory {
 
-  def newSerialWriter[T](out: OutputStream)(implicit typeTag: TypeTag[T]): SerialWriter[T]
+  def newSerialWriter[T: TypeTag](out: OutputStream): SerialWriter[T]
 
-  def newSerialReader[T](in: InputStream)(implicit typeTag: TypeTag[T]): SerialReader[T]
+  def newSerialReader[T: TypeTag](in: InputStream): SerialReader[T]
 
-  def readSingle[T](in: InputStream)(implicit typeTag: TypeTag[T]): T = {
+  def readSingle[T: TypeTag](in: InputStream): T = {
     val reader = newSerialReader[T](in)
     try
       reader.read()
@@ -26,13 +26,13 @@ trait SerialFactory {
       reader.close()
   }
 
-  def fromByteArray[T](bytes: Array[Byte])(implicit typeTag: TypeTag[T]): T =
+  def fromByteArray[T: TypeTag](bytes: Array[Byte]): T =
     readSingle(new ByteArrayInputStream(bytes))
 
-  def fromString[T](value: String)(implicit typeTag: TypeTag[T]): T =
+  def fromString[T: TypeTag](value: String): T =
     fromByteArray(value.getBytes("UTF-8"))
 
-  def writeSingle[T](out: OutputStream, x: T)(implicit ttag: TypeTag[T]) {
+  def writeSingle[T: TypeTag](out: OutputStream, x: T) {
     val writer = newSerialWriter[T](out)
     try
       writer.write(x)
@@ -40,13 +40,13 @@ trait SerialFactory {
       writer.close()
   }
 
-  def toByteArray[T](x: T)(implicit ttag: TypeTag[T]) = {
+  def toByteArray[T: TypeTag](x: T) = {
     val out = new ByteArrayOutputStream
     writeSingle(out, x)
-    out.toByteArray()
+    out.toByteArray
   }
 
-  def toString[T](x: T)(implicit ttag: TypeTag[T]) =
+  def toString[T: TypeTag](x: T) =
     new String(toByteArray(x), "UTF-8")
 
 }

@@ -23,7 +23,7 @@ import org.apache.avro.io.Encoder
 import scala.reflect.runtime.currentMirror
 import scala.reflect.runtime.universe._
 
-class ScalaDatumWriter[T](implicit ttag: TypeTag[T]) extends DatumWriter[T] {
+class ScalaDatumWriter[T: TypeTag] extends DatumWriter[T] {
 
   val schema = Schema.schemaOf[T]
 
@@ -53,14 +53,12 @@ class ScalaDatumWriter[T](implicit ttag: TypeTag[T]) extends DatumWriter[T] {
 
   private def writeOption(encoder: Encoder, option: Option[Any], valueSchema: Schema) {
     option match {
-      case Some(value) => {
+      case Some(value) =>
         encoder.writeIndex(0)
         writeAny(encoder, value, valueSchema)
-      }
-      case None => {
+      case None =>
         encoder.writeIndex(1)
         encoder.writeNull()
-      }
     }
   }
 

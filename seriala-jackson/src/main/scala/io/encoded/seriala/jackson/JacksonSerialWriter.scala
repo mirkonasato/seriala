@@ -11,7 +11,7 @@ import scala.reflect.runtime.currentMirror
 import scala.reflect.runtime.universe._
 import com.fasterxml.jackson.core.JsonGenerator
 
-class JacksonSerialWriter[T](generator: JsonGenerator)(implicit typeTag: TypeTag[T]) extends SerialWriter[T] {
+class JacksonSerialWriter[T: TypeTag](generator: JsonGenerator) extends SerialWriter[T] {
 
   def write(x: T) {
     writeAny(x, Schema.schemaOf[T])

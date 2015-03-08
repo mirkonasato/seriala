@@ -13,7 +13,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonToken
 
-class JacksonSerialReader[T](parser: JsonParser, ignoreUnkwnown: Boolean = false)(implicit typeTag: TypeTag[T]) extends SerialReader[T] {
+  class JacksonSerialReader[T: TypeTag](parser: JsonParser, ignoreUnkwnown: Boolean = false) extends SerialReader[T] {
 
   def read(): T = {
     parser.nextToken()
@@ -23,12 +23,12 @@ class JacksonSerialReader[T](parser: JsonParser, ignoreUnkwnown: Boolean = false
   def close() { parser.close() }
 
   private def readAny(schema: Schema): Any = schema match {
-    case BooleanSchema => parser.getBooleanValue()
-    case IntSchema => parser.getIntValue()
-    case LongSchema => parser.getLongValue()
-    case FloatSchema => parser.getFloatValue()
-    case DoubleSchema => parser.getDoubleValue()
-    case StringSchema => parser.getText()
+    case BooleanSchema => parser.getBooleanValue
+    case IntSchema => parser.getIntValue
+    case LongSchema => parser.getLongValue
+    case FloatSchema => parser.getFloatValue
+    case DoubleSchema => parser.getDoubleValue
+    case StringSchema => parser.getText
     case s: OptionSchema => readOption(s.valueSchema)
     case s: MapSchema => readMap(s.valueSchema)
     case s: ListSchema => readList(s.valueSchema)
@@ -36,46 +36,46 @@ class JacksonSerialReader[T](parser: JsonParser, ignoreUnkwnown: Boolean = false
   }
 
   private def readOption(valueSchema: Schema): Option[Any] = {
-    if (parser.getCurrentToken() == JsonToken.VALUE_NULL) None
+    if (parser.getCurrentToken == JsonToken.VALUE_NULL) None
     else Some(readAny(valueSchema))
   }
 
   private def readList(valueSchema: Schema): List[Any] = {
-    if (parser.getCurrentToken() != JsonToken.START_ARRAY)
-      throw new JsonParseException("not START_ARRAY", parser.getCurrentLocation())
+    if (parser.getCurrentToken != JsonToken.START_ARRAY)
+      throw new JsonParseException("not START_ARRAY", parser.getCurrentLocation)
     val builder = List.newBuilder[Any]
     while (parser.nextToken() != JsonToken.END_ARRAY) {
       builder += readAny(valueSchema)
     }
-    builder.result
+    builder.result()
   }
 
   private def readMap(valueSchema: Schema): Map[String, Any] = {
     val builder = Map.newBuilder[String, Any]
-    if (parser.getCurrentToken() != JsonToken.START_OBJECT)
-      throw new JsonParseException("not START_OBJECT but "+ parser.getCurrentToken(), parser.getCurrentLocation())
+    if (parser.getCurrentToken != JsonToken.START_OBJECT)
+      throw new JsonParseException("not START_OBJECT but "+ parser.getCurrentToken, parser.getCurrentLocation)
     while (parser.nextToken() != JsonToken.END_OBJECT) {
-      if (parser.getCurrentToken() != JsonToken.FIELD_NAME)
-        throw new JsonParseException("not FIELD_NAME", parser.getCurrentLocation())
-      val name = parser.getText()
+      if (parser.getCurrentToken != JsonToken.FIELD_NAME)
+        throw new JsonParseException("not FIELD_NAME", parser.getCurrentLocation)
+      val name = parser.getText
       parser.nextToken()
       val value = readAny(valueSchema)
       builder += name -> value
     }
-    builder.result
+    builder.result()
   }
 
   private def readObject(objectSchema: ObjectSchema) = {
     val fieldMap = objectSchema.fields.toMap
     val valueBuilder = Map.newBuilder[String,Any]
 
-    if (parser.getCurrentToken() != JsonToken.START_OBJECT)
-      throw new JsonParseException("not START_OBJECT but "+ parser.getCurrentToken(), parser.getCurrentLocation())
+    if (parser.getCurrentToken != JsonToken.START_OBJECT)
+      throw new JsonParseException("not START_OBJECT but "+ parser.getCurrentToken, parser.getCurrentLocation)
 
     while (parser.nextToken() != JsonToken.END_OBJECT) {
-      if (parser.getCurrentToken() != JsonToken.FIELD_NAME)
-        throw new JsonParseException("not FIELD_NAME", parser.getCurrentLocation())
-      val name = parser.getText()
+      if (parser.getCurrentToken != JsonToken.FIELD_NAME)
+        throw new JsonParseException("not FIELD_NAME", parser.getCurrentLocation)
+      val name = parser.getText
       parser.nextToken()
       if (fieldMap.contains(name)) {
         val fieldSchema = fieldMap(name)
@@ -85,10 +85,10 @@ class JacksonSerialReader[T](parser: JsonParser, ignoreUnkwnown: Boolean = false
         if (ignoreUnkwnown)
           parser.skipChildren()
         else
-          throw new JsonParseException("unknown field: "+ name +" for object "+ objectSchema, parser.getCurrentLocation())        
+          throw new JsonParseException("unknown field: "+ name +" for object "+ objectSchema, parser.getCurrentLocation)
       }
     }
-    val valueMap = valueBuilder.result
+    val valueMap = valueBuilder.result()
 
     val ctor = objectSchema.scalaType.decl(termNames.CONSTRUCTOR).asMethod
     val values = ctor.paramLists.head map { sym =>
@@ -96,7 +96,7 @@ class JacksonSerialReader[T](parser: JsonParser, ignoreUnkwnown: Boolean = false
       if (valueMap.contains(fieldName)) valueMap(fieldName)
       else fieldMap(fieldName) match {
         case s: OptionSchema => None
-        case _ => throw new JsonParseException("missing required field "+ fieldName +" for object "+ objectSchema, parser.getCurrentLocation())
+        case _ => throw new JsonParseException("missing required field "+ fieldName +" for object "+ objectSchema, parser.getCurrentLocation)
       }
     }
 

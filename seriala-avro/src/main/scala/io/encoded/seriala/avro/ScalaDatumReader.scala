@@ -17,7 +17,7 @@ import io.encoded.seriala.LongSchema
 import io.encoded.seriala.FloatSchema
 import io.encoded.seriala.IntSchema
 
-class ScalaDatumReader[T](implicit ttag: TypeTag[T]) extends DatumReader[T] {
+class ScalaDatumReader[T: TypeTag] extends DatumReader[T] {
 
   val schema = Schema.schemaOf[T]
 
@@ -61,7 +61,7 @@ class ScalaDatumReader[T](implicit ttag: TypeTag[T]) extends DatumReader[T] {
         size = decoder.arrayNext()
       }
     }
-    builder.result
+    builder.result()
   }
 
   private def readMap(decoder: Decoder, valueSchema: Schema): Map[String, Any] = {
@@ -78,7 +78,7 @@ class ScalaDatumReader[T](implicit ttag: TypeTag[T]) extends DatumReader[T] {
         size = decoder.mapNext()
       }
     }
-    builder.result
+    builder.result()
   }
 
   private def readObject(decoder: Decoder, objectSchema: ObjectSchema) = {
@@ -87,7 +87,7 @@ class ScalaDatumReader[T](implicit ttag: TypeTag[T]) extends DatumReader[T] {
       values += readAny(decoder, fieldSchema)
     val ctor = objectSchema.scalaType.decl(termNames.CONSTRUCTOR).asMethod
     val classMirror = currentMirror.reflectClass(objectSchema.scalaType.typeSymbol.asClass)
-    classMirror.reflectConstructor(ctor).apply(values.result: _*)
+    classMirror.reflectConstructor(ctor).apply(values.result(): _*)
   }
 
 }

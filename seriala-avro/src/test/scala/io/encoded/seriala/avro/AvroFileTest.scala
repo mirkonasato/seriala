@@ -30,7 +30,7 @@ class AvroFileTest extends FunSuite with Matchers {
     val fileReader = new DataFileReader(file, datumReader)
     fileReader.next() should equal(Record("one", 1))
     fileReader.next() should equal(Record("two", 2))
-    fileReader.hasNext() should equal(false)
+    fileReader.hasNext should equal(false)
   }
 
 }

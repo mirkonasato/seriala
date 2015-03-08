@@ -44,7 +44,7 @@ object SchemaConversions {
       case s: MapSchema => AvroSchema.createMap(buildSchema(s.valueSchema, recordMap))
       case s: ListSchema => AvroSchema.createArray(buildSchema(s.valueSchema, recordMap))
       case s if recordMap.contains(s) => recordMap(s)
-      case s: ObjectSchema => {
+      case s: ObjectSchema =>
         val recordSchema = AvroSchema.createRecord(s.name, null, null, false)
         val updatedMap = recordMap + (s -> recordSchema)
         val avroFields = s.fields map { field =>
@@ -53,7 +53,6 @@ object SchemaConversions {
         }
         recordSchema.setFields(avroFields)
         recordSchema
-      }
     }
   }
 
