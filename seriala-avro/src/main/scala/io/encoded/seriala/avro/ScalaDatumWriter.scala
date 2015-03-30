@@ -29,7 +29,7 @@ class ScalaDatumWriter[T: TypeTag] extends DatumWriter[T] {
 
   override def setSchema(avroSchema: AvroSchema) {
     if (avroSchema != SchemaConversions.toAvroSchema(schema))
-      throw new IllegalArgumentException("supplied Avro schema incompatible with type "+ schema.name)
+      throw new IllegalArgumentException("supplied Avro schema incompatible with type "+ schema)
   }
 
   override def write(datum: T, encoder: Encoder) {
@@ -84,10 +84,8 @@ class ScalaDatumWriter[T: TypeTag] extends DatumWriter[T] {
   }
 
   private def writeObject(encoder: Encoder, obj: Any, objectSchema: ObjectSchema) {
-    val instance = currentMirror.reflect(obj)
     for ((fieldName, fieldSchema) <- objectSchema.fields) {
-      val accessor = objectSchema.scalaType.member(TermName(fieldName)).asMethod
-      val fieldValue = instance.reflectMethod(accessor).apply()
+      val fieldValue = objectSchema.getFieldValue(obj, fieldName)
       writeAny(encoder, fieldValue, fieldSchema)
     }
   }

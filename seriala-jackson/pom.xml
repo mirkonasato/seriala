@@ -23,7 +23,7 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>seriala-core</artifactId>
+      <artifactId>seriala-core_${scala.version}</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -23,7 +23,7 @@ class ScalaDatumReader[T: TypeTag] extends DatumReader[T] {
 
   override def setSchema(avroSchema: AvroSchema) {
     if (avroSchema != SchemaConversions.toAvroSchema(schema))
-      throw new IllegalArgumentException("supplied Avro schema incompatible with type "+ schema.name)
+      throw new IllegalArgumentException("supplied Avro schema incompatible with type "+ schema)
   }
 
   override def read(reuse: T, decoder: Decoder): T =
@@ -85,9 +85,7 @@ class ScalaDatumReader[T: TypeTag] extends DatumReader[T] {
     val values = List.newBuilder[Any]
     for ((_, fieldSchema) <- objectSchema.fields)
       values += readAny(decoder, fieldSchema)
-    val ctor = objectSchema.scalaType.decl(termNames.CONSTRUCTOR).asMethod
-    val classMirror = currentMirror.reflectClass(objectSchema.scalaType.typeSymbol.asClass)
-    classMirror.reflectConstructor(ctor).apply(values.result(): _*)
+    objectSchema.newInstance(values.result())
   }
 
 }

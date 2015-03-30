@@ -6,12 +6,10 @@
 //
 package io.encoded.seriala.jackson
 
+import com.fasterxml.jackson.core.{JsonParseException, JsonParser, JsonToken}
 import io.encoded.seriala._
-import scala.reflect.runtime.currentMirror
+
 import scala.reflect.runtime.universe._
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.JsonParseException
-import com.fasterxml.jackson.core.JsonToken
 
   class JacksonSerialReader[T: TypeTag](parser: JsonParser, ignoreUnkwnown: Boolean = false) extends SerialReader[T] {
 
@@ -90,18 +88,14 @@ import com.fasterxml.jackson.core.JsonToken
     }
     val valueMap = valueBuilder.result()
 
-    val ctor = objectSchema.scalaType.decl(termNames.CONSTRUCTOR).asMethod
-    val values = ctor.paramLists.head map { sym =>
-      val fieldName = sym.name.decodedName.toString
-      if (valueMap.contains(fieldName)) valueMap(fieldName)
-      else fieldMap(fieldName) match {
-        case s: OptionSchema => None
-        case _ => throw new JsonParseException("missing required field "+ fieldName +" for object "+ objectSchema, parser.getCurrentLocation)
-      }
+    val values: Seq[Any] = objectSchema.fields map {
+      case (fieldName, fieldSchema) =>
+        if (valueMap.contains(fieldName)) valueMap(fieldName)
+        else if (fieldSchema.isInstanceOf[OptionSchema]) None
+        else throw new JsonParseException("missing required field "+ fieldName +" for object "+ objectSchema, parser.getCurrentLocation)
     }
 
-    val classMirror = currentMirror.reflectClass(objectSchema.scalaType.typeSymbol.asClass)
-    classMirror.reflectConstructor(ctor).apply(values: _*)
+    objectSchema.newInstance(values)
   }
 
 }

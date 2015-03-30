@@ -6,33 +6,37 @@
 //
 package io.encoded.seriala
 
+import scala.reflect.runtime._
 import scala.reflect.runtime.universe._
 
-sealed abstract class Schema(val name: String) {
-  override def toString = name
-}
+sealed abstract class Schema
 
-object BooleanSchema extends Schema("Boolean")
-object IntSchema extends Schema("Int")
-object LongSchema extends Schema("Long")
-object FloatSchema extends Schema("Float")
-object DoubleSchema extends Schema("Double")
-object StringSchema extends Schema("String")
-case class OptionSchema(valueSchema: Schema) extends Schema("Option")
-case class ListSchema(valueSchema: Schema) extends Schema("List")
-case class MapSchema(valueSchema: Schema) extends Schema("Map")
+object BooleanSchema extends Schema { override def toString = "ObjectSchema" }
+object IntSchema extends Schema { override def toString = "IntSchema" }
+object LongSchema extends Schema { override def toString = "LongSchema" }
+object FloatSchema extends Schema { override def toString = "FloatSchema" }
+object DoubleSchema extends Schema { override def toString = "DoubleSchema" }
+object StringSchema extends Schema { override def toString = "StringSchema" }
+case class OptionSchema(valueSchema: Schema) extends Schema
+case class ListSchema(valueSchema: Schema) extends Schema
+case class MapSchema(valueSchema: Schema) extends Schema
 
-class ObjectSchema(name: String, val scalaType: Type) extends Schema(name) {
+class ObjectSchema(scalaType: Type) extends Schema {
 
+  val name = scalaType.typeSymbol.name.decodedName.toString
   var _fields: List[(String, Schema)] = null
-
   def fields: List[(String, Schema)] = _fields
 
-  override def toString = name + "(" + fields.foldLeft("") { (s, f) => s + ", " + f._1 + ": " + repr(f._2) } + ")"
+  def getFieldValue(obj: Any, fieldName: String) = {
+    val instance = currentMirror.reflect(obj)
+    val accessor = scalaType.member(TermName(fieldName)).asMethod
+    instance.reflectMethod(accessor).apply()
+  }
 
-  private def repr(schema: Schema) = schema match {
-    case x: ObjectSchema => x.name + "(" + x.fields.foldLeft("") { (s, f) => s + ", " + f._1 + ": " + f._2.name } + ")"
-    case x => x.toString
+  def newInstance(args: Seq[Any]): Any = {
+    val classMirror = currentMirror.reflectClass(scalaType.typeSymbol.asClass)
+    val ctor = scalaType.decl(termNames.CONSTRUCTOR).asMethod
+    classMirror.reflectConstructor(ctor).apply(args: _*)
   }
 }
 
@@ -63,7 +67,7 @@ object Schema {
     case t if knownObjects.contains(t) => knownObjects(t)
     case t =>
       // initialize fields later to handle circular dependencies
-      val objectSchema = new ObjectSchema(t.typeSymbol.name.decodedName.toString, scalaType)
+      val objectSchema = new ObjectSchema(scalaType)
       objectSchema._fields = fieldsOf(t, knownObjects + (t -> objectSchema))
       objectSchema
   }
