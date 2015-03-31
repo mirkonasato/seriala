@@ -33,9 +33,9 @@ class AvroRoundtripTest extends FunSuite with Matchers {
     fromAvro[Option[Int]](toAvro[Option[Int]](None)) should equal(None)
   }
 
-  test("List[Int]") {
-    val x = List(1, 2, 3)
-    fromAvro[List[Int]](toAvro(x)) should equal(x)
+  test("Seq[Int]") {
+    val x = Seq(1, 2, 3)
+    fromAvro[Seq[Int]](toAvro(x)) should equal(x)
   }
 
   test("Map[String,Int]") {

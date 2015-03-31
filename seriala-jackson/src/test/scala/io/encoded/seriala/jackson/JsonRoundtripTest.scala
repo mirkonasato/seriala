@@ -39,9 +39,9 @@ class JsonRoundtripTest extends FunSuite with Matchers {
     fromJson[Option[Int]]("null") should equal(None)
   }
 
-  test("List[Int]") {
-    toJson(List(1, 2, 3)) should equal("[1,2,3]")
-    fromJson[List[Int]]("[1,2,3]") should equal(List(1, 2, 3))
+  test("Seq[Int]") {
+    toJson(Seq(1, 2, 3)) should equal("[1,2,3]")
+    fromJson[Seq[Int]]("[1,2,3]") should equal(Seq(1, 2, 3))
   }
 
   test("Map[String,Int]") {

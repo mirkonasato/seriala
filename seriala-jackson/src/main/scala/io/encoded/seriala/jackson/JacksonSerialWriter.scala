@@ -29,7 +29,7 @@ class JacksonSerialWriter[T: TypeTag](generator: JsonGenerator) extends SerialWr
       case StringSchema => generator.writeString(value.asInstanceOf[String])
       case s: OptionSchema => writeOption(value.asInstanceOf[Option[Any]], s.valueSchema)
       case s: MapSchema => writeMap(value.asInstanceOf[Map[String,Any]], s.valueSchema)
-      case s: ListSchema => writeList(value.asInstanceOf[List[Any]], s.valueSchema)
+      case s: SeqSchema => writeList(value.asInstanceOf[List[Any]], s.valueSchema)
       case s: ObjectSchema => writeObject(value, s)
     }
   }

@@ -30,7 +30,7 @@ import scala.reflect.runtime.universe._
     case StringSchema => parser.getText
     case s: OptionSchema => readOption(s.valueSchema)
     case s: MapSchema => readMap(s.valueSchema)
-    case s: ListSchema => readList(s.valueSchema)
+    case s: SeqSchema => readList(s.valueSchema)
     case s: ObjectSchema => readObject(s)
   }
 

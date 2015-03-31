@@ -20,7 +20,7 @@ package object schema {
   object DoubleSchema extends Schema { override def toString = "DoubleSchema" }
   object StringSchema extends Schema { override def toString = "StringSchema" }
   case class OptionSchema(valueSchema: Schema) extends Schema
-  case class ListSchema(valueSchema: Schema) extends Schema
+  case class SeqSchema(valueSchema: Schema) extends Schema
   case class MapSchema(valueSchema: Schema) extends Schema
 
   class ObjectSchema(scalaType: Type) extends Schema {
@@ -52,7 +52,7 @@ package object schema {
   private val DoubleType = typeOf[Double]
   private val StringType = typeOf[String]
   private val OptionType = typeOf[Option[Any]]
-  private val ListType = typeOf[List[Any]]
+  private val SeqType = typeOf[Seq[Any]]
   private val MapType = typeOf[Map[String, Any]]
 
   def schemaOf[T]()(implicit typeTag: TypeTag[T]) = buildSchema(typeTag.tpe, Map())
@@ -64,9 +64,9 @@ package object schema {
     case t if t <:< FloatType => FloatSchema
     case t if t <:< DoubleType => DoubleSchema
     case t if t <:< StringType => StringSchema
-    case t if t <:< OptionType => new OptionSchema(buildSchema(t.typeArgs(0), knownObjects))
-    case t if t <:< ListType => new ListSchema(buildSchema(t.typeArgs(0), knownObjects))
-    case t if t <:< MapType => new MapSchema(buildSchema(t.typeArgs(1), knownObjects))
+    case t if t <:< OptionType => OptionSchema(buildSchema(t.typeArgs(0), knownObjects))
+    case t if t <:< SeqType => SeqSchema(buildSchema(t.typeArgs(0), knownObjects))
+    case t if t <:< MapType => MapSchema(buildSchema(t.typeArgs(1), knownObjects))
     case t if knownObjects.contains(t) => knownObjects(t)
     case t =>
       // initialize fields later to handle circular dependencies

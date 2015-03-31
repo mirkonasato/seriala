@@ -35,7 +35,7 @@ class ScalaDatumWriter[T: TypeTag] extends DatumWriter[T] {
       case StringSchema => encoder.writeString(value.asInstanceOf[String])
       case s: OptionSchema => writeOption(encoder, value.asInstanceOf[Option[Any]], s.valueSchema)
       case s: MapSchema => writeMap(encoder, value.asInstanceOf[Map[String,Any]], s.valueSchema)
-      case s: ListSchema => writeList(encoder, value.asInstanceOf[List[Any]], s.valueSchema)
+      case s: SeqSchema => writeList(encoder, value.asInstanceOf[List[Any]], s.valueSchema)
       case s: ObjectSchema => writeObject(encoder, value, s)
     }
   }

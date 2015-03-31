@@ -32,7 +32,7 @@ object SchemaConversions {
       case StringSchema => StringDoubleSchema
       case s: OptionSchema => AvroSchema.createUnion(List(buildSchema(s.valueSchema, recordMap), NullAvroSchema))
       case s: MapSchema => AvroSchema.createMap(buildSchema(s.valueSchema, recordMap))
-      case s: ListSchema => AvroSchema.createArray(buildSchema(s.valueSchema, recordMap))
+      case s: SeqSchema => AvroSchema.createArray(buildSchema(s.valueSchema, recordMap))
       case s if recordMap.contains(s) => recordMap(s)
       case s: ObjectSchema =>
         val recordSchema = AvroSchema.createRecord(s.name, null, null, false)

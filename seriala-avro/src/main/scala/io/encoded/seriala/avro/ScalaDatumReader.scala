@@ -27,7 +27,7 @@ class ScalaDatumReader[T: TypeTag] extends DatumReader[T] {
     case StringSchema => decoder.readString()
     case s: OptionSchema => readOption(decoder, s.valueSchema)
     case s: MapSchema => readMap(decoder, s.valueSchema)
-    case s: ListSchema => readList(decoder, s.valueSchema)
+    case s: SeqSchema => readList(decoder, s.valueSchema)
     case s: ObjectSchema => readObject(decoder, s)
   }
 
