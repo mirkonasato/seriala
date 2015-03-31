@@ -26,20 +26,30 @@ package object schema {
   class ObjectSchema(scalaType: Type) extends Schema {
 
     val name = scalaType.typeSymbol.name.decodedName.toString
+    val fullName = scalaType.typeSymbol.fullName
+
     private [schema] var _fields: List[(String, Schema)] = null
 
     def fields: List[(String, Schema)] = _fields
 
-    def getFieldValue(obj: Any, fieldName: String) = {
-      val instance = currentMirror.reflect(obj)
+    def getFieldValue(instance: Any, fieldName: String) = {
+      val instanceMirror = currentMirror.reflect(instance)
       val accessor = scalaType.member(TermName(fieldName)).asMethod
-      instance.reflectMethod(accessor).apply()
+      instanceMirror.reflectMethod(accessor).apply()
     }
 
     def newInstance(args: Seq[Any]): Any = {
       val classMirror = currentMirror.reflectClass(scalaType.typeSymbol.asClass)
       val ctor = scalaType.decl(termNames.CONSTRUCTOR).asMethod
       classMirror.reflectConstructor(ctor).apply(args: _*)
+    }
+
+    override def hashCode = (fullName :: fields).hashCode()
+
+    override def equals(other: Any): Boolean = {
+      if (!other.isInstanceOf[ObjectSchema]) return false
+      val that = other.asInstanceOf[ObjectSchema]
+      that.fullName == this.fullName && that.fields == this.fields
     }
 
     override def toString = "ObjectSchema:"+ name
