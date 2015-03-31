@@ -6,17 +6,7 @@
 //
 package io.encoded.seriala.avro
 
-import io.encoded.seriala.BooleanSchema
-import io.encoded.seriala.DoubleSchema
-import io.encoded.seriala.FloatSchema
-import io.encoded.seriala.IntSchema
-import io.encoded.seriala.ListSchema
-import io.encoded.seriala.LongSchema
-import io.encoded.seriala.MapSchema
-import io.encoded.seriala.ObjectSchema
-import io.encoded.seriala.OptionSchema
-import io.encoded.seriala.Schema
-import io.encoded.seriala.StringSchema
+import io.encoded.seriala.schema._
 import org.apache.avro.{Schema => AvroSchema}
 import scala.collection.JavaConversions.seqAsJavaList
 

@@ -5,7 +5,7 @@ import org.apache.avro.file.DataFileReader
 import org.apache.avro.file.DataFileWriter
 import org.junit.runner.RunWith
 import org.scalatest.{Matchers, FunSuite}
-import io.encoded.seriala.Schema
+import io.encoded.seriala.schema.schemaOf
 import org.scalatest.junit.JUnitRunner
 
 case class Record(name: String, value: Int)
@@ -13,7 +13,7 @@ case class Record(name: String, value: Int)
 @RunWith(classOf[JUnitRunner])
 class AvroFileTest extends FunSuite with Matchers {
 
-  val avroSchema = SchemaConversions.toAvroSchema(Schema.schemaOf[Record])
+  val avroSchema = SchemaConversions.toAvroSchema(schemaOf[Record])
 
   test("Write and read Avro file") {
     val file = File.createTempFile("test", ".avro")

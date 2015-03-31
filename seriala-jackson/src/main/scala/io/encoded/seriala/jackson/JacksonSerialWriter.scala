@@ -6,15 +6,15 @@
 //
 package io.encoded.seriala.jackson
 
-import io.encoded.seriala._
-import scala.reflect.runtime.currentMirror
+import io.encoded.seriala.schema._
+import io.encoded.seriala.SerialWriter
 import scala.reflect.runtime.universe._
 import com.fasterxml.jackson.core.JsonGenerator
 
 class JacksonSerialWriter[T: TypeTag](generator: JsonGenerator) extends SerialWriter[T] {
 
   def write(x: T) {
-    writeAny(x, Schema.schemaOf[T])
+    writeAny(x, schemaOf[T])
   }
 
   def close() { generator.close() }

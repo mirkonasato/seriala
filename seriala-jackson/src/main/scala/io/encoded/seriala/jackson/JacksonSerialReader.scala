@@ -7,7 +7,8 @@
 package io.encoded.seriala.jackson
 
 import com.fasterxml.jackson.core.{JsonParseException, JsonParser, JsonToken}
-import io.encoded.seriala._
+import io.encoded.seriala.schema._
+import io.encoded.seriala.SerialReader
 
 import scala.reflect.runtime.universe._
 
@@ -15,7 +16,7 @@ import scala.reflect.runtime.universe._
 
   def read(): T = {
     parser.nextToken()
-    readAny(Schema.schemaOf[T]).asInstanceOf[T]
+    readAny(schemaOf[T]).asInstanceOf[T]
   }
 
   def close() { parser.close() }

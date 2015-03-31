@@ -1,25 +1,14 @@
 package io.encoded.seriala.avro
 
-import io.encoded.seriala.Schema
+import io.encoded.seriala.schema._
 import org.apache.avro.io.DatumReader
 import org.apache.avro.io.Decoder
 import org.apache.avro.{Schema => AvroSchema}
-import scala.reflect.runtime.universe._
-import scala.reflect.runtime.currentMirror
-import io.encoded.seriala.ListSchema
-import io.encoded.seriala.ObjectSchema
-import io.encoded.seriala.OptionSchema
-import io.encoded.seriala.DoubleSchema
-import io.encoded.seriala.StringSchema
-import io.encoded.seriala.MapSchema
-import io.encoded.seriala.BooleanSchema
-import io.encoded.seriala.LongSchema
-import io.encoded.seriala.FloatSchema
-import io.encoded.seriala.IntSchema
+import scala.reflect.runtime.universe.TypeTag
 
 class ScalaDatumReader[T: TypeTag] extends DatumReader[T] {
 
-  val schema = Schema.schemaOf[T]
+  val schema = schemaOf[T]
 
   override def setSchema(avroSchema: AvroSchema) {
     if (avroSchema != SchemaConversions.toAvroSchema(schema))
